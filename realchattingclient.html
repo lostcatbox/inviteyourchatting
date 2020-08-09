@@ -3,15 +3,15 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Insert title here</title>
-    </head>
+
+</head>
 <body>
+
     <form onsubmit="return false;">
         <!-- 서버로 메시지를 보낼 텍스트 박스 -->
-        <input id="textMessage" type="text">
+        <input id="textMessage" type="text" placeholder="메시지를 입력해주세요">
         <!-- 전송 버튼 -->
         <input onclick="sendMessage()" value="Send" type="button">
-        <!-- 접속 종료 버튼 -->
-        <input onclick="disconnect()" value="Disconnect" type="button">
     </form>
     <br />
     <!-- 출력 area -->
@@ -48,9 +48,9 @@
             //textMessage객체의 값 초기화
             message.value = "";
             }
-        function disconnect(){
-                webSocket.close();
-            }
+
+
+
     </script>
     </body>
 </html>
