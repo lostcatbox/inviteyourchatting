@@ -18,7 +18,8 @@
     <textarea id="messageTextArea" rows="10" cols="50"></textarea>
     <script type="text/javascript">
         // 웹 서버를 접속한다.
-        var webSocket = new WebSocket("ws://220.127.136.25:7777");
+        // var webSocket = new WebSocket("ws://220.127.136.25:7777");
+        var webSocket = new WebSocket("ws://localhost:7777");
         // 웹 서버와의 통신을 주고 받은 결과를 출력할 오브젝트를 가져옵니다.
         var messageTextArea = document.getElementById("messageTextArea");
         // 소켓 접속이 되면 호출되는 함수
