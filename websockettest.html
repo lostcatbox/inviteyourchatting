@@ -4,8 +4,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Insert title here</title>
     </head>
-<body>
-    <form onsubmit="return false;">
+<body onbeforeunload="quit();">
+    <form onsubmit="return false;" >
         <!-- 서버로 메시지를 보낼 텍스트 박스 -->
         <input id="textMessage" type="text">
         <!-- 전송 버튼 -->
@@ -51,6 +51,11 @@
         function disconnect(){
                 webSocket.close();
             }
+
+        <!-- 브라우저 종료시 서버로 메시지를 보낼 텍스트 박스 -->
+        function quit() {
+            webSocket.send('/quit');
+        }
     </script>
     </body>
 </html>
