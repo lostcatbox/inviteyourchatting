@@ -7,6 +7,9 @@
         window.onbeforeunload = function() {
             webSocket.send('/quit');
         };
+        window.onclose = function() {
+            webSocket.send('/quit');
+        };
     </script>
 
 </head>
