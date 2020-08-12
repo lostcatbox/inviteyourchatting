@@ -60,7 +60,8 @@ class UserManager:  # 사용자관리 및 채팅 메세지 전송을 담당하�
                 try:
                     await conn[0].send(msg)
                 except:
-                    del self.users[username]
+                    self.removeUser(username)
+                    pass
 
     async def registerUsername(self, websocket):
         while True:
