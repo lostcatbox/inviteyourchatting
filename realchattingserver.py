@@ -66,6 +66,9 @@ class UserManager:  # 사용자관리 및 채팅 메세지 전송을 담당하�
             username = username.strip()
             if await self.addUser(username, websocket, websocket.remote_address[0]):
                 return username
+        del websocket
+
+
 
 
 async def accept(websocket, path):
