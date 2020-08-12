@@ -56,8 +56,11 @@ class UserManager:  # 사용자관리 및 채팅 메세지 전송을 담당하�
             return -1
 
     async def sendMessageToAll(self, msg):
-        for conn, addr in self.users.values():
-            await conn.send(msg)
+            for username, conn in self.users.items():
+                try:
+                    await conn[0].send(msg)
+                except:
+                    del self.users[username]
 
     async def registerUsername(self, websocket):
         while True:
@@ -66,7 +69,7 @@ class UserManager:  # 사용자관리 및 채팅 메세지 전송을 담당하�
             username = username.strip()
             if await self.addUser(username, websocket, websocket.remote_address[0]):
                 return username
-        del websocket
+
 
 
 
