@@ -1,5 +1,6 @@
 import asyncio
 import websockets
+from random import randint
 
 HOST = ''
 PORT = 7777
@@ -72,6 +73,36 @@ class UserManager:  # 사용자관리 및 채팅 메세지 전송을 담당하�
                 return username
 
 
+present_room = {}
+using_room_number = []
+
+async def issued_using_room_number():
+    while True:
+        room_number = randint(1000,9999)
+        if not room_number in using_room_number:
+            break
+    await lock.acquire()
+    try:
+        using_room_number.append(room_number)
+    finally:
+        lock.release()
+    return room_number
+
+class ChattingRoom():
+    @classmethod
+    async def create(cls):
+        self = ChattingRoom()
+        self.user = UserManager()
+        self.room_number = await issued_using_room_number()
+        present_room[self.room_number] = self
+        return self
+
+
+
+
+
+
+
 
 
 
@@ -79,16 +110,34 @@ async def accept(websocket, path):
 
     print('[%s] 연결됨' % websocket.remote_address[0])
     try:
-        username = await userman.registerUsername(websocket)
+        await websocket.send("룸서버를입력해주세요")
+        room_number = await websocket.recv()
+        room_number = int(room_number) #str에서 int로 변환
+        print("1")
+
+        if not room_number in list(present_room.keys()):
+            print("2")
+            chattingroom = await ChattingRoom.create()
+            await websocket.send('[%i]룸이 생성합니다' % chattingroom.room_number)
+        else:
+            await lock.acquire()
+            try:
+                chattingroom = present_room[room_number]
+            finally:
+                lock.release()
+
+            await websocket.send('[%i]룸에 입장하였습니다' % chattingroom.room_number)
+
+        username = await chattingroom.user.registerUsername(websocket)
         msg = await websocket.recv()
         while msg:
             print(msg)
-            print(userman.users.values())
-            if await userman.messageHandler(username, msg) == -1:
+            print(chattingroom.user.users.values())
+            if await chattingroom.user.messageHandler(username, msg) == -1:
                 break
             msg = await websocket.recv()
         print('[%s] 접속종료' % websocket.remote_address[0])
-        await userman.removeUser(username)
+        await chattingroom.user.removeUser(username)
 
     except Exception as e:
         print(e)
@@ -97,7 +146,6 @@ async def accept(websocket, path):
     # --------------------------------------------------------
     # --------------------------------------------------------
 try:
-    userman = UserManager()
     start_server = websockets.serve(accept, "", 7777);
 
     # 웹 소켓 서버 생성.호스트는 localhost에 port는 9998로 생성한다.
