@@ -117,6 +117,7 @@ async def accept(websocket, path):
 
         if not room_number in list(present_room.keys()):
             print("2")
+            await websocket.send('룸이 존재하지않습니다.')
             chattingroom = await ChattingRoom.create()
             await websocket.send('[%i]룸이 생성합니다' % chattingroom.room_number)
         else:
