@@ -1,6 +1,7 @@
 import asyncio
 import websockets
 from random import randint
+from urllib  import parse
 
 HOST = ''
 PORT = 7777
@@ -72,6 +73,11 @@ class UserManager:  # 사용자관리 및 채팅 메세지 전송을 담당하�
             if await self.addUser(username, websocket, websocket.remote_address[0]):
                 return username
 
+async def get_parameter(urlpath):
+    parse.urlsplit(urlpath)
+    parse.parse_qs(parse.urlsplit(urlpath).query)
+    return dict(parse.parse_qsl(parse.urlsplit(urlpath).query))
+
 
 present_room = {}
 using_room_number = []
@@ -109,26 +115,37 @@ class ChattingRoom():
 async def accept(websocket, path):
 
     print('[%s] 연결됨' % websocket.remote_address[0])
-    try:
-        await websocket.send("룸서버를입력해주세요")
-        room_number = await websocket.recv()
-        room_number = int(room_number) #str에서 int로 변환
-        print("1")
 
-        if not room_number in list(present_room.keys()):
-            print("2")
-            await websocket.send('룸이 존재하지않습니다.')
+
+
+    try:
+        await websocket.send("룸서버에 접속을 시도합니다.")
+        parameter = await get_parameter(path)
+        new = parameter.get('new', None)
+        print(new)
+        if new:
             chattingroom = await ChattingRoom.create()
-            await websocket.send('[%i]룸이 생성합니다' % chattingroom.room_number)
-        else:
+            await websocket.send('[%i]룸이 생성되었습니다' % chattingroom.room_number)
             await lock.acquire()
             try:
-                chattingroom = present_room[room_number]
+                chattingroom = present_room[chattingroom.room_number]
             finally:
                 lock.release()
 
-            await websocket.send('[%i]룸에 입장하였습니다' % chattingroom.room_number)
+        else:
+            try:
+                room_number = int(parameter['roomnumber'])
+            except:
+                await websocket.send('룸넘버를 받지 못했습니다')
+                del websocket
 
+            if not room_number in list(present_room.keys()):
+                await websocket.send('룸이 존재하지않습니다.')
+                await websocket.send('다시 접속부탁드립니다.')
+
+
+
+        await websocket.send('[%i]룸에 입장하였습니다' % chattingroom.room_number)
         username = await chattingroom.user.registerUsername(websocket)
         msg = await websocket.recv()
         while msg:

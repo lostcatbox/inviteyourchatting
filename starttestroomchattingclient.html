@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>채팅 시작하시죠</title>
+
+</head>
+<body>
+    <form onsubmit="return false;">
+        <input onclick="startNewRoom()" value="새로운 방 만들기" type="button">
+        <input id="roomNumber" type="text" placeholder="룸넘버 입력해주세요">
+        <input onclick="connectRoom()" value="기존 방 접속하기" type="button">
+                <!-- 서버로 메시지를 보낼 텍스트 박스 -->
+    </form>
+    <br />
+    <textarea id="messageTextArea" rows="10" cols="50"></textarea>
+    <script type="text/javascript">
+
+        function startNewRoom() {
+            var url = new URL("https://chatting.lostcatbox.com/");
+            url.searchParams.append('new', 'True');
+            window.location.href = url
+        };
+
+        function connectRoom() {
+            var url = new URL("https://chatting.lostcatbox.com/");
+            url.searchParams.append('roomnumber', document.getElementById("roomNumber").value);
+            window.location.href = url
+        };
+
+
+                // 웹 서버를 접속한다.
+        //var webSocket = new WebSocket("ws://220.127.136.25:7777");
+
+        <!-- 브라우저 종료시 서버로 메시지를 보낼 텍스트 박스 -->
+
+
+
+    </script>
+    </body>
+</html>
