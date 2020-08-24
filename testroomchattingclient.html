@@ -26,9 +26,8 @@
     <!-- 출력 area -->
     <textarea id="messageTextArea" rows="10" cols="50"></textarea>
     <script type="text/javascript">
-
         //  url 작성
-        var url = new URL("ws://localhost:7777/");
+        var url = new URL("wss://chatting.lostcatbox.com/websocket/");
             url = url + location.search;
         console.log(url);
         console.log(location.search);
