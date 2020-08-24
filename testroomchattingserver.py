@@ -122,6 +122,7 @@ async def accept(websocket, path):
         await websocket.send("룸서버에 접속을 시도합니다.")
         parameter = await get_parameter(path)
         new = parameter.get('new', None)
+        print(parameter)
         print(new)
         if new:
             chattingroom = await ChattingRoom.create()
@@ -133,16 +134,20 @@ async def accept(websocket, path):
                 lock.release()
 
         else:
-            room_number = int(parameter.get('roomnumber', None))
-            if not room_number in list(present_room.keys()):
-                await websocket.send('룸이 존재하지않습니다.')
-                await websocket.send('다시 접속부탁드립니다.')
-                del websocket
-            await lock.acquire()
             try:
-                chattingroom = present_room[room_number]
-            finally:
-                lock.release()
+                room_number = int(parameter.get('roomnumber', None))
+                if not room_number in list(present_room.keys()):
+                    await websocket.send('룸이 존재하지않습니다.')
+                    await websocket.send('다시 접속부탁드립니다.')
+                    del websocket
+                await lock.acquire()
+                try:
+                    chattingroom = present_room[room_number]
+                finally:
+                    lock.release()
+            except:
+                await websocket.send('룸넘버값이 none으로 반환됨')
+                del websocket
 
 
 
