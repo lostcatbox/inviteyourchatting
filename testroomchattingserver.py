@@ -133,15 +133,18 @@ async def accept(websocket, path):
                 lock.release()
 
         else:
-            try:
-                room_number = int(parameter['roomnumber'])
-            except:
-                await websocket.send('룸넘버를 받지 못했습니다')
-                del websocket
-
+            room_number = int(parameter.get('roomnumber', None))
             if not room_number in list(present_room.keys()):
                 await websocket.send('룸이 존재하지않습니다.')
                 await websocket.send('다시 접속부탁드립니다.')
+                del websocket
+            await lock.acquire()
+            try:
+                chattingroom = present_room[room_number]
+            finally:
+                lock.release()
+
+
 
 
 
