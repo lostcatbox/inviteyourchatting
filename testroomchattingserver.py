@@ -138,7 +138,7 @@ async def accept(websocket, path):
 
             await lock.acquire()
             try:
-                chattingroom = present_room[chattingroom.room_number]
+                chattingroom = present_room[room_number]
             finally:
                 lock.release()
 
