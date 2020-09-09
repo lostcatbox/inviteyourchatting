@@ -82,25 +82,26 @@ async def get_parameter(urlpath):
 present_room = {}
 using_room_number = []
 
-async def issued_using_room_number():
-    while True:
-        room_number = randint(1000,9999)
-        if not room_number in using_room_number:
-            break
-    await lock.acquire()
-    try:
-        using_room_number.append(room_number)
-    finally:
-        lock.release()
-    return room_number
+# async def issued_using_room_number():
+#     while True:
+#         room_number = randint(1000,9999)
+#         if not room_number in using_room_number:
+#             break
+#     await lock.acquire()
+#     try:
+#         using_room_number.append(room_number)
+#     finally:
+#         lock.release()
+#     return room_number
 
 class ChattingRoom():
     @classmethod
-    async def create(cls):
+    async def create(cls, room_number):
         self = ChattingRoom()
         self.user = UserManager()
-        self.room_number = await issued_using_room_number()
+        self.room_number = room_number
         present_room[self.room_number] = self
+
         return self
 
 
@@ -121,33 +122,31 @@ async def accept(websocket, path):
     try:
         await websocket.send("룸서버에 접속을 시도합니다.")
         parameter = await get_parameter(path)
-        new = parameter.get('new', None)
         print(parameter)
-        print(new)
-        if new:
-            chattingroom = await ChattingRoom.create()
-            await websocket.send('[%i]룸이 생성되었습니다' % chattingroom.room_number)
+        try:
+            room_number = int(parameter.get('roomnumber', None))
+        except:
+            await websocket.send('룸넘버값을 숫자로 입력해주세요')
+            await websocket.send('이전페이지에서 방번호를 입력해주세요')
+            del websocket
+
+        try:
+            if not room_number in list(present_room.keys()):
+                await websocket.send('해당 번호로 룸을 생성합니다.')
+                chattingroom = await ChattingRoom.create(room_number)
+                await websocket.send('[%i]룸이 생성되었습니다' % chattingroom.room_number)
+
             await lock.acquire()
             try:
                 chattingroom = present_room[chattingroom.room_number]
             finally:
                 lock.release()
 
-        else:
-            try:
-                room_number = int(parameter.get('roomnumber', None))
-                if not room_number in list(present_room.keys()):
-                    await websocket.send('룸이 존재하지않습니다.')
-                    await websocket.send('다시 접속부탁드립니다.')
-                    del websocket
-                await lock.acquire()
-                try:
-                    chattingroom = present_room[room_number]
-                finally:
-                    lock.release()
-            except:
-                await websocket.send('룸넘버값이 none으로 반환됨')
-                del websocket
+        except:
+            await websocket.send('룸넘버값이 없습니다')
+            await websocket.send('이전페이지에서 방번호를 입력해주세요')
+            del websocket
+
 
 
 

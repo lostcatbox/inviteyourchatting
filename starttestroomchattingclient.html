@@ -7,7 +7,8 @@
 </head>
 <body>
     <form onsubmit="return false;">
-        <input onclick="startNewRoom()" value="새로운 방 만들기" type="button">
+        <p>생성을 원하는 방번호를 입력해주세요</p>
+        <p>또는 참가하고 싶은 방번호를 입력해주세요</p>
         <br/>
         <br/>
         <input id="roomNumber" type="text" placeholder="룸넘버 입력해주세요">
@@ -17,11 +18,12 @@
     <br />
     <script type="text/javascript">
 
-        function startNewRoom() {
-            var url = new URL("https://chatting.lostcatbox.com/");
-            url.searchParams.append('new', 'True');
-            window.location.href = url
-        };
+        // function startNewRoom() {
+        //     var url = new URL("https://chatting.lostcatbox.com/");
+        //     url.searchParams.append('new', 'True');
+        //     url.searchParams.append('roomnumber', document.getElementById("newroomNumber").value);
+        //     window.location.href = url
+        // };
 
         function connectRoom() {
             var url = new URL("https://chatting.lostcatbox.com/");
